@@ -12,25 +12,33 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class QuizApp extends Application {
+public class QuizApp extends Application
+{
 
-    // Inner class to store a question and its answer
-    private static class Question {
-        String questionText;
-        String answer;
+    private static class Question
+    {
+        final String questionText;
+        final String answer;
 
-        Question(String questionText, String answer) {
+        Question(final String questionText, final String answer)
+        {
             this.questionText = questionText;
             this.answer = answer;
         }
     }
+
+    private static final int NUMBER_OF_QUESTIONS = 10;
+    private static final int ZERO = 0;
+    private static final int WIDTH_OF_THE_SCENE = 400;
+    private static final int HEIGHT_OF_THE_SCENE = 300;
+    private static final String QUIZ_FILE_NAME = "/quiz.txt";
 
     // Data structures for questions and quiz state
     private List<Question> allQuestions;
@@ -54,8 +62,8 @@ public class QuizApp extends Application {
     private VBox mainLayout;
 
     @Override
-    public void start(Stage stage) {
-        // Initialize UI components
+    public void start(final Stage stage)
+    {
         questionLabel = new Label("Press 'Start Quiz' to begin!");
         timerLabel = new Label("Time: ");
         answerField = new TextField();
@@ -70,13 +78,14 @@ public class QuizApp extends Application {
         startQuizButton.setOnAction(e -> startQuiz());
 
         // Arrange components in a VBox
-        mainLayout = new VBox(10);
+        mainLayout = new VBox(NUMBER_OF_QUESTIONS);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setPadding(new Insets(20));
-        mainLayout.getChildren().addAll(questionLabel, timerLabel, answerField, submitButton, scoreLabel, startQuizButton);
+        mainLayout.getChildren()
+                .addAll(questionLabel, timerLabel, answerField, submitButton, scoreLabel, startQuizButton);
 
-        Scene scene = new Scene(mainLayout, 400, 300);
-        // Add external stylesheet if available (styles.css should be in your project resources)
+        final Scene scene;
+        scene = new Scene(mainLayout, WIDTH_OF_THE_SCENE, HEIGHT_OF_THE_SCENE);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         stage.setScene(scene);
@@ -88,19 +97,22 @@ public class QuizApp extends Application {
         submitButton.setDisable(true);
     }
 
-    // Called when the user clicks "Start Quiz"
-    private void startQuiz() {
+    private void startQuiz()
+    {
         loadQuestions();
-        score = 0;
-        currentQuestionIndex = 0;
+        score = ZERO;
+        currentQuestionIndex = ZERO;
         missedQuestions = new ArrayList<>();
         scoreLabel.setText("Score: " + score);
 
         // Shuffle the questions and choose 10 random ones (or all if less than 10)
         Collections.shuffle(allQuestions);
-        if (allQuestions.size() > 10) {
-            quizQuestions = allQuestions.subList(0, 10);
-        } else {
+        if(allQuestions.size() > NUMBER_OF_QUESTIONS)
+        {
+            quizQuestions = allQuestions.subList(ZERO, NUMBER_OF_QUESTIONS);
+        }
+        else
+        {
             quizQuestions = new ArrayList<>(allQuestions);
         }
 
@@ -113,32 +125,40 @@ public class QuizApp extends Application {
         showNextQuestion();
     }
 
-    // Load all questions from quiz.txt; each line must be in the format: question|answer
-    private void loadQuestions() {
+    // Load all questions from quiz.txt
+    private void loadQuestions()
+    {
         allQuestions = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(getClass().getResourceAsStream("/quiz.txt"))))
+        try(BufferedReader br = new BufferedReader(
+                new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(QUIZ_FILE_NAME)))))
         {
             String line;
-            while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
+            while((line = br.readLine()) != null)
+            {
+                if(line.trim().isEmpty()) continue;
                 String[] parts = line.split("\\|");
-                if (parts.length >= 2) {
+                if(parts.length >= 2)
+                {
                     allQuestions.add(new Question(parts[0].trim(), parts[1].trim()));
                 }
             }
-        } catch (IOException e) {
+        }
+        catch(final IOException e)
+        {
             e.printStackTrace();
             questionLabel.setText("Error loading quiz file!");
         }
     }
 
     // Display the next question or end the quiz if all questions have been answered
-    private void showNextQuestion() {
-        if (timer != null) {
+    private void showNextQuestion()
+    {
+        if(timer != null)
+        {
             timer.stop();
         }
-        if (currentQuestionIndex >= quizQuestions.size()) {
+        if(currentQuestionIndex >= quizQuestions.size())
+        {
             endQuiz();
             return;
         }
@@ -151,13 +171,16 @@ public class QuizApp extends Application {
     }
 
     // Start a countdown timer for the current question
-    private void startTimer() {
-        timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+    private void startTimer()
+    {
+        timer = new Timeline(new KeyFrame(Duration.seconds(1), event ->
+        {
             timeLeft--;
             timerLabel.setText("Time: " + timeLeft);
-            if (timeLeft <= 0) {
+            if(timeLeft <= ZERO)
+            {
                 timer.stop();
-                // Time's up: record the question as missed and move on
+                // Record the question as missed and move on
                 missedQuestions.add(quizQuestions.get(currentQuestionIndex));
                 currentQuestionIndex++;
                 showNextQuestion();
@@ -168,17 +191,21 @@ public class QuizApp extends Application {
     }
 
     // Check the submitted answer and update the score accordingly
-    private void submitAnswer() {
-        if (timer != null) {
+    private void submitAnswer()
+    {
+        if(timer != null)
+        {
             timer.stop();
         }
         Question currentQuestion = quizQuestions.get(currentQuestionIndex);
         String userAnswer = answerField.getText().trim();
 
-        if (userAnswer.equalsIgnoreCase(currentQuestion.answer)) {
+        if(userAnswer.equalsIgnoreCase(currentQuestion.answer))
+        {
             score++;
-        } else {
-            // Record the question for summary if answered incorrectly
+        }
+        else
+        {
             missedQuestions.add(currentQuestion);
         }
         scoreLabel.setText("Score: " + score);
@@ -187,14 +214,17 @@ public class QuizApp extends Application {
     }
 
     // End the quiz, show the final score and summary of missed questions, then allow a restart
-    private void endQuiz() {
+    private void endQuiz()
+    {
         answerField.setDisable(true);
         submitButton.setDisable(true);
         StringBuilder summary = new StringBuilder();
         summary.append("Quiz Over! Final Score: ").append(score).append("\n");
-        if (!missedQuestions.isEmpty()) {
+        if(!missedQuestions.isEmpty())
+        {
             summary.append("Missed Questions:\n");
-            for (Question q : missedQuestions) {
+            for(Question q : missedQuestions)
+            {
                 summary.append(q.questionText)
                         .append(" (Answer: ").append(q.answer).append(")\n");
             }
@@ -204,7 +234,7 @@ public class QuizApp extends Application {
         startQuizButton.setDisable(false);
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch(args);
     }
 }
