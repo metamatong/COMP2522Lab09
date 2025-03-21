@@ -105,6 +105,7 @@ public class QuizApp extends Application
         );
 
         final Scene scene = new Scene(mainLayout, WIDTH_OF_THE_SCENE, HEIGHT_OF_THE_SCENE);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
 
         stage.setScene(scene);
         stage.setTitle("Quiz App");
