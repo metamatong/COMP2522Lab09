@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -122,6 +124,16 @@ public class QuizApp extends Application
     private void startQuiz()
     {
         loadQuestions();
+
+        // If we fail to read 10 questions, show an error and return immediately
+        if(allQuestions.size() < NUMBER_OF_QUESTIONS)
+        {
+            Alert alert = new Alert(AlertType.ERROR, "Error: Could not read 10 questions from the file. " +
+                    "Please check the file and try again.");
+            alert.showAndWait();
+            return;
+        }
+
         score = ZERO;
         currentQuestionIndex = ZERO;
         missedQuestions = new ArrayList<>();
