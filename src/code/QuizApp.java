@@ -87,7 +87,7 @@ public class QuizApp extends Application
 
         // Event handling for button click and ENTER key
         submitButton.setOnAction(e -> submitAnswer());
-        answerField.setOnAction(e -> submitAnswer()); // Handles ENTER key
+        answerField.setOnAction(e -> submitAnswer());
         startQuizButton.setOnAction(e -> startQuiz());
 
         // Arrange components in a VBox
