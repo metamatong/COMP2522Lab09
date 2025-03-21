@@ -44,7 +44,7 @@ public class QuizApp extends Application
     private static final int NUMBER_OF_QUESTIONS = 10;
     private static final int ZERO = 0;
     private static final int WIDTH_OF_THE_SCENE = 400;
-    private static final int HEIGHT_OF_THE_SCENE = 300;
+    private static final int HEIGHT_OF_THE_SCENE = 600;
     private static final String QUIZ_FILE_NAME = "/quiz.txt";
 
     // Data structures for questions and quiz state
@@ -66,6 +66,7 @@ public class QuizApp extends Application
     private Button submitButton;
     private Button startQuizButton;
     private Label scoreLabel;
+    private Label missedSummaryLabel;
     private VBox mainLayout;
 
     /**
@@ -82,6 +83,7 @@ public class QuizApp extends Application
         submitButton = new Button("Submit");
         startQuizButton = new Button("Start Quiz");
         scoreLabel = new Label("Score: 0");
+        missedSummaryLabel = new Label();
 
         // Event handling for button click and ENTER key
         submitButton.setOnAction(e -> submitAnswer());
@@ -89,15 +91,20 @@ public class QuizApp extends Application
         startQuizButton.setOnAction(e -> startQuiz());
 
         // Arrange components in a VBox
-        mainLayout = new VBox(NUMBER_OF_QUESTIONS);
+        mainLayout = new VBox(10);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setPadding(new Insets(20));
-        mainLayout.getChildren()
-                .addAll(questionLabel, timerLabel, answerField, submitButton, scoreLabel, startQuizButton);
+        mainLayout.getChildren().addAll(
+                questionLabel,
+                timerLabel,
+                answerField,
+                submitButton,
+                scoreLabel,
+                startQuizButton,
+                missedSummaryLabel
+        );
 
-        final Scene scene;
-        scene = new Scene(mainLayout, WIDTH_OF_THE_SCENE, HEIGHT_OF_THE_SCENE);
-        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        final Scene scene = new Scene(mainLayout, WIDTH_OF_THE_SCENE, HEIGHT_OF_THE_SCENE);
 
         stage.setScene(scene);
         stage.setTitle("Quiz App");
@@ -118,6 +125,7 @@ public class QuizApp extends Application
         currentQuestionIndex = ZERO;
         missedQuestions = new ArrayList<>();
         scoreLabel.setText("Score: " + score);
+        missedSummaryLabel.setText("");
 
         // Shuffle the questions and choose 10 random ones (or all if less than 10)
         Collections.shuffle(allQuestions);
@@ -140,14 +148,15 @@ public class QuizApp extends Application
     }
 
     /*
-     * this method loads the chose quiz questions.
+     * this method loads the chosen quiz questions.
      */
     // Load all questions from quiz.txt
     private void loadQuestions()
     {
         allQuestions = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(QUIZ_FILE_NAME)))))
+                new InputStreamReader(Objects.requireNonNull(
+                        getClass().getResourceAsStream(QUIZ_FILE_NAME)))))
         {
             String line;
             while((line = br.readLine()) != null)
@@ -242,24 +251,36 @@ public class QuizApp extends Application
     /*
      * this method closes the app once time is over.
      */
-    // End the quiz, show the final score and summary of missed questions, then allow a restart
+    // end the quiz, show the final score and summary of missed questions, then allow a restart
     private void endQuiz()
     {
+        // disable input
         answerField.setDisable(true);
         submitButton.setDisable(true);
+
+        // build a summary
         StringBuilder summary = new StringBuilder();
         summary.append("Quiz Over! Final Score: ").append(score).append("\n");
+
         if(!missedQuestions.isEmpty())
         {
-            summary.append("Missed Questions:\n");
+            summary.append("\nMissed Questions:\n");
             for(Question q : missedQuestions)
             {
-                summary.append(q.questionText)
+                summary.append("• ")
+                        .append(q.questionText)
                         .append(" (Answer: ").append(q.answer).append(")\n");
             }
         }
-        questionLabel.setText(summary.toString());
+
+        // display the summary
+        missedSummaryLabel.setText(summary.toString());
+
+        // update the main question label and timer label
+        questionLabel.setText("Quiz Over!");
         timerLabel.setText("");
+
+        // allow another quiz start
         startQuizButton.setDisable(false);
     }
 
@@ -267,7 +288,8 @@ public class QuizApp extends Application
      * drives the GUI for this quiz app.
      * @param args arguments from command line.
      */
-    public static void main(final String[] args) {
+    public static void main(final String[] args)
+    {
         launch(args);
     }
 }
