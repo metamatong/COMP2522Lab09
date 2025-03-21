@@ -19,6 +19,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Demonstrates quiz app.
+ *
+ * @author clinton nguyen
+ * @author kyle cheon
+ * @version 1.0
+ */
 public class QuizApp extends Application
 {
 
@@ -61,6 +68,10 @@ public class QuizApp extends Application
     private Label scoreLabel;
     private VBox mainLayout;
 
+    /**
+     * This method loads GUI for JavaFX
+     * @param stage is the stage used to draw scenes
+     */
     @Override
     public void start(final Stage stage)
     {
@@ -97,6 +108,9 @@ public class QuizApp extends Application
         submitButton.setDisable(true);
     }
 
+    /*
+     * this app starts the quiz.
+     */
     private void startQuiz()
     {
         loadQuestions();
@@ -125,6 +139,9 @@ public class QuizApp extends Application
         showNextQuestion();
     }
 
+    /*
+     * this method loads the chose quiz questions.
+     */
     // Load all questions from quiz.txt
     private void loadQuestions()
     {
@@ -150,6 +167,9 @@ public class QuizApp extends Application
         }
     }
 
+    /*
+     * this method displays next UI for next quiz question
+     */
     // Display the next question or end the quiz if all questions have been answered
     private void showNextQuestion()
     {
@@ -170,6 +190,9 @@ public class QuizApp extends Application
         startTimer();
     }
 
+    /*
+     * this method starts timer.
+     */
     // Start a countdown timer for the current question
     private void startTimer()
     {
@@ -190,6 +213,9 @@ public class QuizApp extends Application
         timer.play();
     }
 
+    /*
+     * this method stores and submits user's answer
+     */
     // Check the submitted answer and update the score accordingly
     private void submitAnswer()
     {
@@ -213,6 +239,9 @@ public class QuizApp extends Application
         showNextQuestion();
     }
 
+    /*
+     * this method closes the app once time is over.
+     */
     // End the quiz, show the final score and summary of missed questions, then allow a restart
     private void endQuiz()
     {
@@ -234,6 +263,10 @@ public class QuizApp extends Application
         startQuizButton.setDisable(false);
     }
 
+    /**
+     * drives the GUI for this quiz app.
+     * @param args arguments from command line.
+     */
     public static void main(final String[] args) {
         launch(args);
     }
